@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 
 class Expense extends StatelessWidget {
+  final String expenseId;
   final String title;
+  final String description;
   final String category;
   final int amount;
-  final bool expenditure; // true -> It is expenditure, not income
+  final bool earning; // true -> It is earning, not income
   const Expense(
       {super.key,
       required this.title,
       required this.category,
       required this.amount,
-      required this.expenditure});
+      required this.earning,
+      required this.expenseId,
+      required this.description});
 
   @override
   Widget build(BuildContext context) {
@@ -18,8 +22,8 @@ class Expense extends StatelessWidget {
       leading: CircleAvatar(
         backgroundColor: Colors.white,
         child: Icon(
-          expenditure == true ? Icons.arrow_upward : Icons.arrow_downward,
-          color: expenditure == true ? Colors.red : Colors.green,
+          earning == false ? Icons.arrow_upward : Icons.arrow_downward,
+          color: earning == false ? Colors.red : Colors.green,
         ),
       ),
       title: Text(

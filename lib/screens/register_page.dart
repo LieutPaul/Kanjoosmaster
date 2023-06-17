@@ -1,3 +1,4 @@
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:kanjoosmaster/main.dart';
 import 'package:kanjoosmaster/screens/signin_page.dart';
 import 'package:kanjoosmaster/screens/welcome_page.dart';
@@ -49,9 +50,15 @@ class RegisterPageState extends State<RegisterPage> {
           email: emailController.text.trim(),
           password: passwordController.text.trim());
     } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(e.message!),
-      ));
+      Fluttertoast.showToast(
+          msg: e.message!,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.grey,
+          textColor: Colors.white,
+          fontSize: 20.0);
+      return;
     }
 
     navigatorKey.currentState!.popUntil((route) => route.isFirst);

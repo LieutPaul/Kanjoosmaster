@@ -1,10 +1,11 @@
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:kanjoosmaster/helper/helper.dart';
 import 'package:kanjoosmaster/widgets/checkbox.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:budget_tracker/widgets/expense_component.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kanjoosmaster/widgets/expense_component.dart';
 
 class DailyPage extends StatefulWidget {
   const DailyPage({super.key});
@@ -52,6 +53,7 @@ class _DailyPageState extends State<DailyPage> {
         expenseCategory = "";
     int expenseAmount = 0;
     bool earning = false;
+    bool canAdd = false;
     await showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -140,18 +142,23 @@ class _DailyPageState extends State<DailyPage> {
                     onPressed: () {
                       if (expenseTitle != "" &&
                           expenseCategory != "" &&
-                          expenseAmount >= 0) {
+                          expenseAmount > 0) {
                         Navigator.of(context).pop([
                           expenseTitle,
                           expenseDescription,
                           expenseCategory,
                           expenseAmount
                         ]);
+                        canAdd = true;
                       } else {
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(const SnackBar(
-                          content: Text("Please Enter Valid Inputs"),
-                        ));
+                        Fluttertoast.showToast(
+                            msg: "Please Enter Valid Inputs",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.CENTER,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.grey,
+                            textColor: Colors.white,
+                            fontSize: 20.0);
                       }
                     },
                     child: const Text(
@@ -160,15 +167,17 @@ class _DailyPageState extends State<DailyPage> {
                     )),
               ],
             ));
-
-    await FirebaseFirestore.instance.collection("Expenses").add({
-      "Title": expenseTitle,
-      "Description": expenseDescription,
-      "Category": expenseCategory,
-      "Amount": expenseAmount,
-      "Earning": earning,
-      "Users": [currentUser!.email]
-    });
+    if (canAdd) {
+      await FirebaseFirestore.instance.collection("Expenses").add({
+        "Title": expenseTitle,
+        "Date": formatter.format(DateTime.now()).substring(0, 10),
+        "Description": expenseDescription,
+        "Category": expenseCategory,
+        "Amount": expenseAmount,
+        "Earning": earning,
+        "Users": [currentUser!.email]
+      });
+    }
   }
 
   Widget body() {
@@ -178,17 +187,52 @@ class _DailyPageState extends State<DailyPage> {
         children: [
           topBar(),
           Expanded(
-            flex: 1,
-            child: ListView(children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
-                child: Text(formatDate(_selectedDate),
-                    style: const TextStyle(
-                        fontSize: 20,
-                        color: Color.fromARGB(255, 180, 218, 255))),
-              ),
-            ]),
-          ),
+              flex: 1,
+              child: StreamBuilder(
+                stream: FirebaseFirestore.instance
+                    .collection('Expenses')
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else {
+                    final List<Widget> expenseWidgets = [];
+                    expenseWidgets.add(Padding(
+                      padding: const EdgeInsets.only(
+                          left: 15, right: 15, bottom: 15),
+                      child: Text(formatDate(_selectedDate),
+                          style: const TextStyle(
+                              fontSize: 20,
+                              color: Color.fromARGB(255, 180, 218, 255))),
+                    ));
+                    final documents = snapshot.data?.docs;
+                    if (documents != null) {
+                      for (var doc in documents) {
+                        final data = doc.data();
+                        final List<dynamic>? users = data['Users'];
+                        if (users != null &&
+                            users.contains(currentUser!.email) &&
+                            data['Date'] != null &&
+                            data['Date'] == _selectedDate) {
+                          expenseWidgets.add(
+                            Expense(
+                                expenseId: doc.id,
+                                title: data['Title'],
+                                description: data["Description"],
+                                category: data['Category'],
+                                earning: data['Earning'],
+                                amount: data['Amount']),
+                          );
+                        }
+                      }
+                    }
+
+                    return ListView(children: expenseWidgets);
+                  }
+                },
+              )),
         ]);
   }
 
