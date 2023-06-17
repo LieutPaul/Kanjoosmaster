@@ -14,7 +14,7 @@ List<DateTime> getWeekFromLastSunday() {
 }
 
 String formatDate(String dateString) {
-  DateTime date = DateFormat('yyyy-MM-dd').parse(dateString);
+  DateTime date = DateFormat('yyyy/MM/dd').parse(dateString);
   DateFormat formatter = DateFormat('EEEE, d MMMM yyyy');
   String formattedDate = formatter.format(date);
   return formattedDate;

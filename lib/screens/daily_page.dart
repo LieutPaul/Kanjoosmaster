@@ -17,7 +17,7 @@ class DailyPage extends StatefulWidget {
 
 class _DailyPageState extends State<DailyPage> {
   final currentUser = FirebaseAuth.instance.currentUser;
-  DateFormat formatter = DateFormat('yyyy-MM-dd');
+  DateFormat formatter = DateFormat('yyyy/MM/dd');
   String _selectedDate = "";
   List<DateTime> week = [];
   List<String> days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];

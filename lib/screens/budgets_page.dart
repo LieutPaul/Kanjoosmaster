@@ -17,9 +17,27 @@ class BudgetsWidget extends StatefulWidget {
 
 class _BudgetsWidgetState extends State<BudgetsWidget> {
   final currentUser = FirebaseAuth.instance.currentUser;
+  bool expensesFetched = false;
+  Map<String, num> expenses = {};
   DateFormat formatter = DateFormat('MMM yyyy/MM');
   String _selectedMonth = "";
   List<String> months = [];
+
+  Future<void> getSpentAmount() async {
+    expenses = {};
+    var doc = await FirebaseFirestore.instance.collection("Expenses").get();
+    for (var expense in doc.docs) {
+      if (expense["Users"].contains(currentUser!.email) &&
+          _selectedMonth.substring(4) == expense["Date"].substring(0, 7)) {
+        if (expenses.keys.contains(expense["Category"]) == false) {
+          expenses[expense["Category"]] = expense["Amount"];
+        } else {
+          expenses[expense["Category"]] =
+              expenses[expense["Category"]]! + expense["Amount"];
+        }
+      }
+    }
+  }
 
   @override
   void initState() {
@@ -43,7 +61,29 @@ class _BudgetsWidgetState extends State<BudgetsWidget> {
             )
           : null,
       backgroundColor: Colors.black.withOpacity(0.80),
-      body: body(),
+      body: FutureBuilder<void>(
+        future: getSpentAmount(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Center(child: CircularProgressIndicator()),
+                SizedBox(height: 20),
+                Center(
+                    child: Text(
+                  "Fetching Content",
+                  style: TextStyle(color: Colors.white),
+                )),
+              ],
+            );
+          } else if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          } else {
+            return body();
+          }
+        },
+      ),
     );
   }
 
@@ -83,8 +123,14 @@ class _BudgetsWidgetState extends State<BudgetsWidget> {
                       final budgetAmount = budget['Budget'];
                       final date = budget['Date'];
                       if (date == _selectedMonth) {
-                        expenseWidgets.add(
-                            circularBudgetChart(category, 1500, budgetAmount));
+                        expenseWidgets.add(const SizedBox(height: 20));
+                        if (expenses.keys.contains(category)) {
+                          expenseWidgets.add(circularBudgetChart(category,
+                              expenses[category]!.toInt(), budgetAmount));
+                        } else {
+                          expenseWidgets.add(
+                              circularBudgetChart(category, 0, budgetAmount));
+                        }
                       }
                     }
 
@@ -182,10 +228,11 @@ class _BudgetsWidgetState extends State<BudgetsWidget> {
           padding: const EdgeInsets.all(10.0),
           child: Column(
             children: [
-              const SizedBox(height: 10),
+              const SizedBox(height: 15),
               Text(
                 "Budget for $category",
                 style: const TextStyle(
+                    decoration: TextDecoration.underline,
                     fontWeight: FontWeight.bold,
                     fontSize: 17.0,
                     color: Colors.white),
@@ -206,7 +253,7 @@ class _BudgetsWidgetState extends State<BudgetsWidget> {
                     fontSize: 17.0,
                     color: Colors.white),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 5),
             ],
           ),
         ),
