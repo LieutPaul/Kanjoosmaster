@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kanjoosmaster/widgets/expense_component.dart';
+import '../widgets/custom_dropdown.dart';
 
 class DailyPage extends StatefulWidget {
   const DailyPage({super.key});
@@ -48,12 +49,23 @@ class _DailyPageState extends State<DailyPage> {
   }
 
   Future<void> addExpense() async {
+    var documentSnapshot = await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(currentUser!.email)
+        .get();
+
+    List<dynamic>? eCategories = documentSnapshot.data()?["ExpenseCategories"];
+    List<String> expenseCategories = [];
+    for (String c in eCategories!) {
+      expenseCategories.add(c);
+    }
     String expenseTitle = "",
         expenseDescription = "No Description",
-        expenseCategory = "";
+        expenseCategory = "Food";
     int expenseAmount = 0;
     bool earning = false;
     bool canAdd = false;
+    // ignore: use_build_context_synchronously
     await showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -85,16 +97,18 @@ class _DailyPageState extends State<DailyPage> {
                           expenseDescription = value;
                         },
                       ),
-                      TextField(
-                        autofocus: true,
-                        style: const TextStyle(color: Colors.black),
-                        decoration: const InputDecoration(
-                            hintText: "Category of Expense",
-                            hintStyle: TextStyle(color: Colors.grey)),
-                        onChanged: (value) {
-                          expenseCategory = value;
-                        },
-                      ),
+                      const SizedBox(height: 10),
+                      const Text("Expense Category:"),
+                      const SizedBox(height: 10),
+                      CustomDropdownButton2(
+                          hint: 'Select Item',
+                          dropdownItems: expenseCategories,
+                          value: expenseCategory,
+                          onChanged: (value) {
+                            setState(() {
+                              expenseCategory = value!;
+                            });
+                          }),
                       TextField(
                         keyboardType: TextInputType.number,
                         autofocus: true,

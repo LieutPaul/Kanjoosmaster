@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:kanjoosmaster/main.dart';
 import 'package:kanjoosmaster/screens/signin_page.dart';
@@ -46,9 +47,25 @@ class RegisterPageState extends State<RegisterPage> {
         builder: (context) => const Center(child: CircularProgressIndicator()));
 
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: emailController.text.trim(),
-          password: passwordController.text.trim());
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+              email: emailController.text.trim(),
+              password: passwordController.text.trim());
+      FirebaseFirestore.instance
+          .collection("Users")
+          .doc(userCredential.user!.email)
+          .set({
+        "Name": nameController.text,
+        "ExpenseCategories": [
+          "Food",
+          "Drinks",
+          "Stationery",
+          "Travel",
+          "Utilities",
+          "Miscallaneous"
+        ],
+        "Budgets": []
+      });
     } on FirebaseAuthException catch (e) {
       Fluttertoast.showToast(
           msg: e.message!,

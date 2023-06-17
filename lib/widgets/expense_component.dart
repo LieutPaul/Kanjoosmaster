@@ -22,7 +22,7 @@ class Expense extends StatelessWidget {
       leading: CircleAvatar(
         backgroundColor: Colors.white,
         child: Icon(
-          earning == false ? Icons.arrow_upward : Icons.arrow_downward,
+          Icons.money_sharp,
           color: earning == false ? Colors.red : Colors.green,
         ),
       ),

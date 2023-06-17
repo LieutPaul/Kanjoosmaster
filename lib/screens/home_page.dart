@@ -1,3 +1,4 @@
+import 'package:kanjoosmaster/screens/budgets_page.dart';
 import 'package:kanjoosmaster/screens/daily_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
@@ -14,7 +15,7 @@ class HomePageState extends State<HomePage> {
 
   static const List<Widget> _widgetOptions = <Widget>[
     DailyPage(),
-    Center(child: Text("Stats")),
+    BudgetsWidget(),
     Center(child: Text("Profile"))
   ];
 
