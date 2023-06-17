@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "956356419439",
+    "project_id": "kanjoosmaster",
+    "storage_bucket": "kanjoosmaster.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:956356419439:android:d63856f04947c0e4f8529a",
+        "android_client_info": {
+          "package_name": "com.example.budget_tracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "956356419439-ek4cu6t334tdavftjtc1qbk7086q29qa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAcbVURNjBA2ZqijJRO2wUiuvkhJZ66OUA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "956356419439-ek4cu6t334tdavftjtc1qbk7086q29qa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:956356419439:android:307dde2ebe19a74ef8529a",
+        "android_client_info": {
+          "package_name": "com.example.kanjoosmaster"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "956356419439-ek4cu6t334tdavftjtc1qbk7086q29qa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAcbVURNjBA2ZqijJRO2wUiuvkhJZ66OUA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "956356419439-ek4cu6t334tdavftjtc1qbk7086q29qa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
