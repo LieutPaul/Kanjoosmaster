@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:kanjoosmaster/helper/helper.dart';
+import 'package:kanjoosmaster/widgets/expense_component.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 import '../widgets/custom_dropdown.dart';
@@ -18,22 +19,28 @@ class BudgetsWidget extends StatefulWidget {
 class _BudgetsWidgetState extends State<BudgetsWidget> {
   final currentUser = FirebaseAuth.instance.currentUser;
   bool expensesFetched = false;
-  Map<String, num> expenses = {};
+  Map<String, num> expenseSums = {};
+  Map<String, List<dynamic>> listOfExpenses = {};
   DateFormat formatter = DateFormat('MMM yyyy/MM');
   String _selectedMonth = "";
   List<String> months = [];
 
   Future<void> getSpentAmount() async {
-    expenses = {};
+    expenseSums = {};
+    listOfExpenses = {};
     var doc = await FirebaseFirestore.instance.collection("Expenses").get();
     for (var expense in doc.docs) {
+      Map<String, dynamic> temp = expense.data();
+      temp["Id"] = expense.id;
       if (expense["Users"].contains(currentUser!.email) &&
           _selectedMonth.substring(4) == expense["Date"].substring(0, 7)) {
-        if (expenses.keys.contains(expense["Category"]) == false) {
-          expenses[expense["Category"]] = expense["Amount"];
+        if (expenseSums.keys.contains(expense["Category"]) == false) {
+          expenseSums[expense["Category"]] = expense["Amount"];
+          listOfExpenses[expense["Category"]] = [temp];
         } else {
-          expenses[expense["Category"]] =
-              expenses[expense["Category"]]! + expense["Amount"];
+          expenseSums[expense["Category"]] =
+              expenseSums[expense["Category"]]! + expense["Amount"];
+          listOfExpenses[expense["Category"]]?.add(temp);
         }
       }
     }
@@ -93,52 +100,77 @@ class _BudgetsWidgetState extends State<BudgetsWidget> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           topBar(),
-          Expanded(
-              flex: 1,
-              child: StreamBuilder(
-                stream: FirebaseFirestore.instance
-                    .collection('Users')
-                    .doc(currentUser!.email)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    final data = snapshot.data?.data();
-                    final budgets = data?['Budgets'] as List<dynamic>?;
-                    final List<Widget> expenseWidgets = [];
-                    expenseWidgets.add(Padding(
-                      padding: const EdgeInsets.only(
-                          left: 15, right: 15, bottom: 30),
-                      child: Text("Budgets for $_selectedMonth",
-                          style: const TextStyle(
-                              fontSize: 20,
-                              color: Color.fromARGB(255, 180, 218, 255))),
-                    ));
-
-                    for (final budget in budgets!) {
-                      final category = budget['Category'];
-                      final budgetAmount = budget['Budget'];
-                      final date = budget['Date'];
-                      if (date == _selectedMonth) {
-                        expenseWidgets.add(const SizedBox(height: 20));
-                        if (expenses.keys.contains(category)) {
-                          expenseWidgets.add(circularBudgetChart(category,
-                              expenses[category]!.toInt(), budgetAmount));
-                        } else {
-                          expenseWidgets.add(
-                              circularBudgetChart(category, 0, budgetAmount));
-                        }
-                      }
-                    }
-
-                    return ListView(children: expenseWidgets);
-                  }
-                },
-              )),
+          getBudgetWheels(),
         ]);
+  }
+
+  Expanded getBudgetWheels() {
+    return Expanded(
+        flex: 1,
+        child: StreamBuilder(
+          stream: FirebaseFirestore.instance
+              .collection('Users')
+              .doc(currentUser!.email)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else {
+              final data = snapshot.data?.data();
+              final budgets = data?['Budgets'] as List<dynamic>?;
+              final List<Widget> expenseWidgets = [];
+              expenseWidgets.add(Padding(
+                padding: const EdgeInsets.only(left: 15, right: 15, bottom: 30),
+                child: Text("Budgets for $_selectedMonth",
+                    style: const TextStyle(
+                        fontSize: 20,
+                        color: Color.fromARGB(255, 180, 218, 255))),
+              ));
+
+              for (final budget in budgets!) {
+                final category = budget['Category'];
+                final budgetAmount = budget['Budget'];
+                final date = budget['Date'];
+                if (date == _selectedMonth) {
+                  expenseWidgets.add(const SizedBox(height: 20));
+                  if (expenseSums.keys.contains(category)) {
+                    expenseWidgets.add(circularBudgetChart(category,
+                        expenseSums[category]!.toInt(), budgetAmount));
+                  } else {
+                    expenseWidgets
+                        .add(circularBudgetChart(category, 0, budgetAmount));
+                  }
+                }
+              }
+              for (var entry in listOfExpenses.entries) {
+                String category = entry.key;
+                List<dynamic> expenses = entry.value;
+                expenseWidgets.add(Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: Text(category,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800)),
+                ));
+                for (var expense in expenses) {
+                  expenseWidgets.add(Expense(
+                    title: expense["Title"],
+                    category: expense["Category"],
+                    amount: expense["Amount"],
+                    earning: expense["Earning"],
+                    expenseId: expense["Id"],
+                    description: expense["Description"],
+                  ));
+                  expenseWidgets.add(const SizedBox(height: 10));
+                }
+              }
+              return ListView(children: expenseWidgets);
+            }
+          },
+        ));
   }
 
   Container topBar() {
