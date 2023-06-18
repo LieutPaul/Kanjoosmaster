@@ -157,13 +157,13 @@ class _BudgetsWidgetState extends State<BudgetsWidget> {
                 ));
                 for (var expense in expenses) {
                   expenseWidgets.add(Expense(
-                    title: expense["Title"],
-                    category: expense["Category"],
-                    amount: expense["Amount"],
-                    earning: expense["Earning"],
-                    expenseId: expense["Id"],
-                    description: expense["Description"],
-                  ));
+                      title: expense["Title"],
+                      category: expense["Category"],
+                      amount: expense["Amount"],
+                      earning: expense["Earning"],
+                      expenseId: expense["Id"],
+                      description: expense["Description"],
+                      date: expense["Date"]));
                   expenseWidgets.add(const SizedBox(height: 10));
                 }
               }
