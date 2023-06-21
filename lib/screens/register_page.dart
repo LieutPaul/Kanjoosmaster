@@ -75,6 +75,7 @@ class RegisterPageState extends State<RegisterPage> {
           backgroundColor: Colors.grey,
           textColor: Colors.white,
           fontSize: 20.0);
+      navigatorKey.currentState!.popUntil((route) => route.isFirst);
       return;
     }
 
