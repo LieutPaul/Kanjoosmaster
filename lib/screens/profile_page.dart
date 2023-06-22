@@ -1,9 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kanjoosmaster/widgets/my_text_button.dart';
 import '../helper/get_categories.dart';
 import '../helper/get_large_expenses.dart';
+import '../helper/get_username.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -35,7 +35,7 @@ class _ProfilePageState extends State<ProfilePage> {
           child: ListView(
             children: [
               const Icon(Icons.person, size: 162, color: Colors.white),
-              getUserName(),
+              getUserName(context),
               const SizedBox(height: 10),
               Center(
                 child: SizedBox(
@@ -113,38 +113,6 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
       ),
-    );
-  }
-
-  Row getUserName() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        StreamBuilder(
-            stream: FirebaseFirestore.instance
-                .collection("Users")
-                .doc(currentUser!.email)
-                .snapshots(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              } else {
-                if (snapshot.hasData) {
-                  return Text(
-                    "${(snapshot.data!.data())?["Name"]} ",
-                    style: const TextStyle(color: Colors.white, fontSize: 26),
-                  );
-                } else if (snapshot.hasError) {
-                  return Text("Error ${snapshot.error}");
-                }
-
-                return Text("${currentUser!.email}");
-              }
-            }),
-        const Icon(Icons.edit, color: Colors.white)
-      ],
     );
   }
 }
