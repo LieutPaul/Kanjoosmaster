@@ -64,7 +64,8 @@ class RegisterPageState extends State<RegisterPage> {
           "Utilities",
           "Miscallaneous"
         ],
-        "Budgets": []
+        "Budgets": [],
+        "LargeExpenses": []
       });
     } on FirebaseAuthException catch (e) {
       Fluttertoast.showToast(
