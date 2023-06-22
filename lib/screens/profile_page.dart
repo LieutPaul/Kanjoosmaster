@@ -11,9 +11,9 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   var currentUser = FirebaseAuth.instance.currentUser;
-  void _signOut() {
-    FirebaseAuth.instance.signOut();
-  }
+  // void _signOut() {
+  //   FirebaseAuth.instance.signOut();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +39,17 @@ class _ProfilePageState extends State<ProfilePage> {
               style: TextStyle(
                   color: Color.fromARGB(255, 115, 177, 117), fontSize: 20)),
         ),
-        getExpenses(),
+        getCategories(),
+        const Divider(
+          color: Colors.white,
+          thickness: 1,
+        ),
+        const SizedBox(height: 10),
+        const Center(
+          child: Text("Large Purchases",
+              style: TextStyle(
+                  color: Color.fromARGB(255, 115, 177, 117), fontSize: 20)),
+        ),
       ],
     );
   }
@@ -76,7 +86,55 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Column getExpenses() {
+  Column getCategories() {
+    Future<void> addCategory() async {
+      String newCategory = "";
+      await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+                backgroundColor: Colors.white,
+                title: const Text("Enter New Category",
+                    style: TextStyle(color: Colors.black)),
+                content: TextField(
+                  autofocus: true,
+                  style: const TextStyle(color: Colors.black),
+                  decoration: const InputDecoration(
+                      hintText: "Enter new Category",
+                      hintStyle: TextStyle(color: Colors.grey)),
+                  onChanged: (value) {
+                    newCategory = value;
+                  },
+                ),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text(
+                        "Cancel",
+                        style: TextStyle(color: Colors.black),
+                      )),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(newCategory);
+                      },
+                      child: const Text(
+                        "Add",
+                        style: TextStyle(color: Colors.black),
+                      )),
+                ],
+              ));
+      if (newCategory.trim().isNotEmpty) {
+        await FirebaseFirestore.instance
+            .collection("Users")
+            .doc(currentUser!.email)
+            .update({
+          "ExpenseCategories": FieldValue.arrayUnion(
+              [newCategory[0].toUpperCase() + newCategory.substring(1)])
+        });
+      }
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -107,21 +165,23 @@ class _ProfilePageState extends State<ProfilePage> {
                   w.add(
                     Center(
                         child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () => addCategory(),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 40.0, vertical: 10.0),
+                            horizontal: 20.0, vertical: 10.0),
                         shape: const StadiumBorder(),
                       ),
                       child: const Text(
-                        "Add Expense",
-                        style: TextStyle(color: Colors.white, fontSize: 18),
+                        "Add Category",
+                        style: TextStyle(color: Colors.white, fontSize: 15),
                       ),
                     )),
                   );
+                  w.add(const SizedBox(height: 15));
                   return Padding(
-                    padding: const EdgeInsets.all(25),
+                    padding:
+                        const EdgeInsets.only(top: 25, right: 25, left: 25),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: w,
