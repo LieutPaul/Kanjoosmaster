@@ -1,10 +1,10 @@
-import 'package:kanjoosmaster/helper/helper.dart';
+import 'package:kanjoosmaster/helper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:kanjoosmaster/widgets/expense_component.dart';
-import '../helper/add_expense.dart';
+import 'package:kanjoosmaster/components/expense_component.dart';
+import '../components/add_expense.dart';
 
 class DailyPage extends StatefulWidget {
   const DailyPage({super.key});

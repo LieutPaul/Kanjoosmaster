@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
-import '../widgets/expense_component.dart';
+import 'expense_component.dart';
 
 Widget circularBudgetChart(String category, int spentAmount, int budget) {
   double percentage = spentAmount / budget;

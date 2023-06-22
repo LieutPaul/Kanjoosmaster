@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kanjoosmaster/widgets/my_text_button.dart';
-import '../helper/get_categories.dart';
-import '../helper/get_large_expenses.dart';
-import '../helper/get_username.dart';
+import '../components/get_categories.dart';
+import '../components/get_large_expenses.dart';
+import '../components/get_username.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});

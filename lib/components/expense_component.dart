@@ -270,6 +270,7 @@ class _ExpenseState extends State<Expense> {
                       try {
                         CollectionReference expensesCollection =
                             FirebaseFirestore.instance.collection('Expenses');
+
                         DocumentReference documentRef =
                             expensesCollection.doc(widget.expenseId);
 

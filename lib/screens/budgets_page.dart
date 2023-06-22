@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:kanjoosmaster/helper/helper.dart';
-import '../helper/add_budget.dart';
-import '../helper/budget_wheels.dart';
+import 'package:kanjoosmaster/helper.dart';
+import '../components/add_budget.dart';
+import '../components/budget_wheels.dart';
 
 class BudgetsWidget extends StatefulWidget {
   const BudgetsWidget({super.key});
