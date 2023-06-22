@@ -66,10 +66,10 @@ class HomePageState extends State<HomePage> {
           text: 'Daily',
         ),
         GButton(
-          icon: Icons.bar_chart,
+          icon: Icons.wallet,
           iconColor: Colors.white,
           textColor: Colors.black,
-          text: 'Stats',
+          text: 'Budgets',
         ),
         GButton(
           icon: Icons.person,

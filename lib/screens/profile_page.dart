@@ -19,38 +19,69 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black.withOpacity(0.80),
-      body: SafeArea(child: body()),
+      body: body(),
     );
   }
 
   Widget body() {
-    return ListView(
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        const Icon(Icons.person, size: 162, color: Colors.white),
-        getUserName(),
-        const SizedBox(height: 10),
-        const Divider(
-          color: Colors.white,
-          thickness: 1,
-        ),
-        const SizedBox(height: 10),
-        const Center(
-          child: Text("Expense Categories",
-              style: TextStyle(
-                  color: Color.fromARGB(255, 115, 177, 117), fontSize: 20)),
-        ),
-        getCategories(),
-        const Divider(
-          color: Colors.white,
-          thickness: 1,
-        ),
-        const SizedBox(height: 10),
-        const Center(
-          child: Text("Large Purchases",
-              style: TextStyle(
-                  color: Color.fromARGB(255, 115, 177, 117), fontSize: 20)),
+        topBar(),
+        Expanded(
+          child: ListView(
+            children: [
+              const Icon(Icons.person, size: 162, color: Colors.white),
+              getUserName(),
+              const SizedBox(height: 10),
+              const Divider(
+                color: Colors.white,
+                thickness: 1,
+              ),
+              const SizedBox(height: 10),
+              const Center(
+                child: Text("Expense Categories",
+                    style: TextStyle(
+                        color: Color.fromARGB(255, 115, 177, 117),
+                        fontSize: 20)),
+              ),
+              getCategories(),
+              const Divider(
+                color: Colors.white,
+                thickness: 1,
+              ),
+              const SizedBox(height: 10),
+              const Center(
+                child: Text("Large Purchases",
+                    style: TextStyle(
+                        color: Color.fromARGB(255, 115, 177, 117),
+                        fontSize: 20)),
+              ),
+            ],
+          ),
         ),
       ],
+    );
+  }
+
+  Container topBar() {
+    return Container(
+      color: Colors.black,
+      child: SafeArea(
+        child: Container(
+          decoration: const BoxDecoration(
+            color: Colors.black,
+          ),
+          child: const Padding(
+            padding: EdgeInsets.symmetric(vertical: 15),
+            child: Center(
+                child: Text(
+              "Profile Details",
+              style: TextStyle(fontSize: 25, color: Colors.white),
+            )),
+          ),
+        ),
+      ),
     );
   }
 
