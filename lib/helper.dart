@@ -49,3 +49,15 @@ List<String> getMonthsBeforeAndAfter(List<String> monthsList) {
 
   return monthsList;
 }
+
+int getNumberOfDaysInMonth(String dateString) {
+  dateString = dateString.substring(4);
+  List<String> parts = dateString.split('/');
+  int year = int.parse(parts[0]);
+  int month = int.parse(parts[1]);
+
+  DateTime date = DateTime(year, month + 1, 0);
+  int numberOfDays = date.day;
+
+  return numberOfDays;
+}

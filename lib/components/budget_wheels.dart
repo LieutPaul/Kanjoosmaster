@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
+import 'analysis_chart.dart';
 import 'expense_component.dart';
 
 Widget circularBudgetChart(String category, int spentAmount, int budget) {
@@ -84,7 +85,10 @@ Expanded getBudgetWheels(String selectedMonth, Map<String, num> expenseSums,
           } else {
             final data = snapshot.data?.data();
             final budgets = data?['Budgets'] as List<dynamic>?;
-            final List<Widget> expenseWidgets = [];
+            final List<Widget> expenseWidgets = [
+              SpendingAnalysis(selectedMonth: selectedMonth),
+              const SizedBox(height: 20)
+            ];
             expenseWidgets.add(Padding(
               padding: const EdgeInsets.only(left: 15, right: 15, bottom: 30),
               child: Text("Budgets for $selectedMonth",
