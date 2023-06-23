@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:kanjoosmaster/components/large_expense_component.dart';
 import 'package:kanjoosmaster/widgets/my_text_button.dart';
+import 'package:uuid/uuid.dart';
 
 Column getLargeExpenses(BuildContext context) {
   var currentUser = FirebaseAuth.instance.currentUser;
@@ -78,7 +80,13 @@ Column getLargeExpenses(BuildContext context) {
         .doc(currentUser!.email)
         .update({
       "LargeExpenses": FieldValue.arrayUnion([
-        {"Title": expenseTitle, "Amount": expenseAmount}
+        {
+          "Id": const Uuid().v4(),
+          "Title": expenseTitle,
+          "Amount": expenseAmount,
+          "SavedAmount": 0,
+          "Links": []
+        }
       ])
     });
   }
@@ -102,17 +110,16 @@ Column getLargeExpenses(BuildContext context) {
                     snapshot.data!.data()?["LargeExpenses"];
                 List<Widget> w = [const SizedBox(height: 5)];
                 for (var expense in lExpenses) {
-                  w.add(ListTile(
-                    title: Text(
-                      expense["Title"],
-                      style: const TextStyle(fontSize: 19, color: Colors.white),
-                    ),
-                    trailing: Text("${expense["Amount"]}",
-                        style: const TextStyle(
-                            fontSize: 17.5, color: Colors.white)),
-                  ));
+                  w.add(
+                    LargeExpense(
+                        title: expense["Title"],
+                        amount: expense["Amount"],
+                        links: expense["Links"],
+                        id: expense["Id"],
+                        savedAmount: expense["SavedAmount"]),
+                  );
                 }
-                w.add(const SizedBox(height: 10));
+                w.add(const SizedBox(height: 25));
                 w.add(
                   Center(
                     child: SizedBox(
