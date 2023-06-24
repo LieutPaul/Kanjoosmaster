@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:kanjoosmaster/components/add_user_to_expense.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Expense extends StatefulWidget {
@@ -244,6 +245,12 @@ class _ExpenseState extends State<Expense> {
                     },
                     child: const Text(
                       "Close",
+                      style: TextStyle(color: Colors.black),
+                    )),
+                TextButton(
+                    onPressed: () => addUser(context, widget.expenseId),
+                    child: const Text(
+                      "Add User to Expense",
                       style: TextStyle(color: Colors.black),
                     )),
                 TextButton(
