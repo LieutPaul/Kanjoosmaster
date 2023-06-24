@@ -17,8 +17,13 @@ Future<void> addExpense(BuildContext context) async {
 
   List<dynamic>? eCategories = documentSnapshot.data()?["ExpenseCategories"];
   List<String> expenseCategories = [];
+  List<String> earningCategories = [];
   for (String c in eCategories!) {
     expenseCategories.add(c);
+  }
+  eCategories = documentSnapshot.data()?["EarningCategories"];
+  for (String c in eCategories!) {
+    earningCategories.add(c);
   }
   String expenseTitle = "",
       expenseDescription = "No Description",
@@ -62,19 +67,22 @@ Future<void> addExpense(BuildContext context) async {
                           expenseDescription = value;
                         },
                       ),
-                      if (earning == false) const SizedBox(height: 10),
-                      if (earning == false) const Text("Expense Category:"),
-                      if (earning == false) const SizedBox(height: 10),
-                      if (earning == false)
-                        CustomDropdownButton2(
-                            hint: 'Select Item',
-                            dropdownItems: expenseCategories,
-                            value: expenseCategory,
-                            onChanged: (value) {
-                              setState(() {
-                                expenseCategory = value!;
-                              });
-                            }),
+                      const SizedBox(height: 10),
+                      Text(earning == false
+                          ? "Expense Category"
+                          : "Earning Category"),
+                      const SizedBox(height: 10),
+                      CustomDropdownButton2(
+                          hint: 'Select Item',
+                          dropdownItems: (earning == false)
+                              ? expenseCategories
+                              : earningCategories,
+                          value: expenseCategory,
+                          onChanged: (value) {
+                            setState(() {
+                              expenseCategory = value!;
+                            });
+                          }),
                       TextField(
                         keyboardType: TextInputType.number,
                         autofocus: true,
@@ -98,6 +106,11 @@ Future<void> addExpense(BuildContext context) async {
                             initialValue: earning,
                             onChanged: (value) {
                               setState(() {
+                                if (value == false) {
+                                  expenseCategory = "Food";
+                                } else {
+                                  expenseCategory = "Pocket Money";
+                                }
                                 earning = value;
                               });
                             },
@@ -157,7 +170,7 @@ Future<void> addExpense(BuildContext context) async {
       "Title": expenseTitle,
       "Date": formatter.format(DateTime.now()).substring(0, 10),
       "Description": expenseDescription,
-      "Category": earning == false ? expenseCategory : "Earning",
+      "Category": expenseCategory,
       "Amount": expenseAmount,
       "Earning": earning,
       "Users": [currentUser.email]

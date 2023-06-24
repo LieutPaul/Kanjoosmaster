@@ -1,7 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:kanjoosmaster/components/get_earning_categories.dart';
 import 'package:kanjoosmaster/widgets/my_text_button.dart';
-import '../components/get_categories.dart';
+import '../components/get_expense_categories.dart';
 import '../components/get_large_expenses.dart';
 import '../components/get_username.dart';
 
@@ -61,7 +62,20 @@ class _ProfilePageState extends State<ProfilePage> {
                         color: Color.fromARGB(255, 115, 177, 117),
                         fontSize: 25)),
               ),
-              getCategories(context),
+              getExpenseCategories(context),
+              const Divider(
+                color: Colors.white,
+                thickness: 1,
+              ),
+              const SizedBox(height: 10),
+              const Center(
+                child: Text("Earning Categories",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: Color.fromARGB(255, 115, 177, 117),
+                        fontSize: 25)),
+              ),
+              getEarningCategories(context),
               const Divider(
                 color: Colors.white,
                 thickness: 1,

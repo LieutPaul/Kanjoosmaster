@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:kanjoosmaster/widgets/my_text_button.dart';
 
-Column getCategories(BuildContext context) {
+Column getExpenseCategories(BuildContext context) {
   var currentUser = FirebaseAuth.instance.currentUser;
   Future<void> addCategory() async {
     String newCategory = "";

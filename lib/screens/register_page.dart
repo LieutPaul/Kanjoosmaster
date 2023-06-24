@@ -64,6 +64,7 @@ class RegisterPageState extends State<RegisterPage> {
           "Utilities",
           "Miscallaneous"
         ],
+        "EarningCategories": ["Pocket Money", "TA Money"],
         "Budgets": [],
         "LargeExpenses": []
       });

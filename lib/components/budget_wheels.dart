@@ -174,6 +174,10 @@ Expanded getBudgetWheels(String selectedMonth, Map<String, num> expenseSums,
             for (var entry in listOfExpenses.entries) {
               String category = entry.key;
               List<dynamic> expenses = entry.value;
+              int total = 0;
+              for (var expense in expenses) {
+                total += expense["Amount"] as int;
+              }
               expenseWidgets.add(Padding(
                 padding: const EdgeInsets.all(15),
                 child: Text(category,
@@ -193,7 +197,17 @@ Expanded getBudgetWheels(String selectedMonth, Map<String, num> expenseSums,
                     date: expense["Date"]));
                 expenseWidgets.add(const SizedBox(height: 10));
               }
+              expenseWidgets.add(Center(
+                child: Text(
+                  "Total - $total",
+                  style: const TextStyle(
+                      color: Color.fromARGB(255, 172, 255, 207),
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500),
+                ),
+              ));
             }
+            expenseWidgets.add(const SizedBox(height: 20));
             return ListView(children: expenseWidgets);
           }
         },
