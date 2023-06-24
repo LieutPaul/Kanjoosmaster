@@ -6,7 +6,9 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'analysis_chart.dart';
 import 'expense_component.dart';
 
-Widget circularBudgetChart(String category, int spentAmount, int budget) {
+Widget circularBudgetChart(String id, String category, int spentAmount,
+    int budget, BuildContext context) {
+  final currentUser = FirebaseAuth.instance.currentUser;
   double percentage = spentAmount / budget;
   Color progressColor = Colors.green;
 
@@ -32,6 +34,63 @@ Widget circularBudgetChart(String category, int spentAmount, int budget) {
         padding: const EdgeInsets.all(10.0),
         child: Column(
           children: [
+            const SizedBox(height: 5),
+            GestureDetector(
+              onTap: () async {
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext context) {
+                    return const Dialog(
+                      child: Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            CircularProgressIndicator(),
+                            SizedBox(width: 16.0),
+                            Text('Deleting...'),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                );
+                try {
+                  CollectionReference expensesCollection =
+                      FirebaseFirestore.instance.collection('Users');
+
+                  DocumentReference documentRef =
+                      expensesCollection.doc(currentUser!.email);
+
+                  DocumentSnapshot<Map<String, dynamic>> snapshot =
+                      await documentRef.get()
+                          as DocumentSnapshot<Map<String, dynamic>>;
+
+                  if (snapshot.exists) {
+                    Map<String, dynamic> data = snapshot.data()!;
+
+                    List<dynamic> budgets = List.from(data['Budgets']);
+
+                    budgets.removeWhere((budget) {
+                      return budget["Id"] == id;
+                    });
+
+                    await documentRef.update({'Budgets': budgets});
+                  }
+                  // ignore: use_build_context_synchronously
+                  Navigator.pop(context);
+                } catch (error) {
+                  // ignore: avoid_print
+                  print('Error deleting document: $error');
+                  Navigator.pop(context);
+                }
+              },
+              child: const Icon(
+                Icons.delete,
+                color: Colors.red,
+              ),
+            ),
             const SizedBox(height: 15),
             Text(
               "Budget for $category",
@@ -100,14 +159,15 @@ Expanded getBudgetWheels(String selectedMonth, Map<String, num> expenseSums,
               final category = budget['Category'];
               final budgetAmount = budget['Budget'];
               final date = budget['Date'];
+              final id = budget["Id"];
               if (date == selectedMonth) {
                 expenseWidgets.add(const SizedBox(height: 20));
                 if (expenseSums.keys.contains(category)) {
-                  expenseWidgets.add(circularBudgetChart(
-                      category, expenseSums[category]!.toInt(), budgetAmount));
+                  expenseWidgets.add(circularBudgetChart(id, category,
+                      expenseSums[category]!.toInt(), budgetAmount, context));
                 } else {
-                  expenseWidgets
-                      .add(circularBudgetChart(category, 0, budgetAmount));
+                  expenseWidgets.add(circularBudgetChart(
+                      id, category, 0, budgetAmount, context));
                 }
               }
             }

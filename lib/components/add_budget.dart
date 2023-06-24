@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:uuid/uuid.dart';
 
 import '../widgets/custom_dropdown.dart';
 
@@ -93,6 +94,7 @@ Future<void> addBudget(BuildContext context, String selectedMonth) async {
         .update({
       "Budgets": FieldValue.arrayUnion([
         {
+          "Id": const Uuid().v4(),
           "Category": budgetCategory,
           "Budget": budgetAmount,
           "Date": selectedMonth
