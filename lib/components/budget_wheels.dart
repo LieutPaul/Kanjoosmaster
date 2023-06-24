@@ -2,8 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-
-import 'analysis_chart.dart';
+import '../helper.dart';
 import 'expense_component.dart';
 
 Widget circularBudgetChart(String id, String category, int spentAmount,
@@ -126,8 +125,8 @@ Widget circularBudgetChart(String id, String category, int spentAmount,
   );
 }
 
-Expanded getBudgetWheels(String selectedMonth, Map<String, num> expenseSums,
-    Map<String, List<dynamic>> listOfExpenses) {
+Expanded getBudgetWheels(String firstDate, String secondDate,
+    Map<String, num> expenseSums, Map<String, List<dynamic>> listOfExpenses) {
   final currentUser = FirebaseAuth.instance.currentUser;
   return Expanded(
       flex: 1,
@@ -144,13 +143,11 @@ Expanded getBudgetWheels(String selectedMonth, Map<String, num> expenseSums,
           } else {
             final data = snapshot.data?.data();
             final budgets = data?['Budgets'] as List<dynamic>?;
-            final List<Widget> expenseWidgets = [
-              SpendingAnalysis(selectedMonth: selectedMonth),
-              const SizedBox(height: 20)
-            ];
+            final List<Widget> expenseWidgets = [];
             expenseWidgets.add(Padding(
               padding: const EdgeInsets.only(left: 15, right: 15, bottom: 30),
-              child: Text("Budgets for $selectedMonth",
+              child: Text("Budgets for $firstDate - $secondDate",
+                  textAlign: TextAlign.center,
                   style: const TextStyle(
                       fontSize: 20, color: Color.fromARGB(255, 180, 218, 255))),
             ));
@@ -158,9 +155,11 @@ Expanded getBudgetWheels(String selectedMonth, Map<String, num> expenseSums,
             for (final budget in budgets!) {
               final category = budget['Category'];
               final budgetAmount = budget['Budget'];
-              final date = budget['Date'];
+              final budgetFirstdate = budget['FirstDate'];
+              final budgetSeconddate = budget['SecondDate'];
               final id = budget["Id"];
-              if (date == selectedMonth) {
+              if (isFirstDateBeforeOrSame(firstDate, budgetFirstdate) &&
+                  isFirstDateBeforeOrSame(budgetSeconddate, secondDate)) {
                 expenseWidgets.add(const SizedBox(height: 20));
                 if (expenseSums.keys.contains(category)) {
                   expenseWidgets.add(circularBudgetChart(id, category,

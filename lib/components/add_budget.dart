@@ -2,12 +2,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:kanjoosmaster/helper.dart';
+import 'package:kanjoosmaster/widgets/date_picker.dart';
 import 'package:uuid/uuid.dart';
-
 import '../widgets/custom_dropdown.dart';
 
-Future<void> addBudget(BuildContext context, String selectedMonth) async {
+Future<void> addBudget(BuildContext context) async {
+  final firstDate = TextEditingController();
+  final secondDate = TextEditingController();
   final currentUser = FirebaseAuth.instance.currentUser;
+
   bool canAdd = false;
   var documentSnapshot = await FirebaseFirestore.instance
       .collection("Users")
@@ -28,35 +32,37 @@ Future<void> addBudget(BuildContext context, String selectedMonth) async {
             backgroundColor: Colors.white,
             title: const Text("Add a Budget",
                 style: TextStyle(color: Colors.black)),
-            content: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.9,
-                child: SingleChildScrollView(
-                    child: Column(
-                  children: [
-                    CustomDropdownButton2(
-                        hint: 'Select Item',
-                        dropdownItems: expenseCategories,
-                        value: budgetCategory,
-                        onChanged: (value) {
-                          budgetCategory = value!;
-                        }),
-                    const SizedBox(height: 15),
-                    TextField(
-                      keyboardType: TextInputType.number,
-                      autofocus: true,
-                      style: const TextStyle(color: Colors.black),
-                      decoration: const InputDecoration(
-                          hintText: "Budget Amount",
-                          hintStyle: TextStyle(color: Colors.grey)),
-                      onChanged: (value) {
-                        int? parsedValue = int.tryParse(value);
-                        if (parsedValue != null) {
-                          budgetAmount = parsedValue;
-                        }
-                      },
-                    ),
-                  ],
-                ))),
+            content: SingleChildScrollView(
+                child: Column(
+              children: [
+                CustomDropdownButton2(
+                    hint: 'Select Item',
+                    dropdownItems: expenseCategories,
+                    value: budgetCategory,
+                    onChanged: (value) {
+                      budgetCategory = value!;
+                    }),
+                const SizedBox(height: 15),
+                DatePicker(dateInput: firstDate, hintText: "First Date"),
+                const SizedBox(height: 10),
+                DatePicker(dateInput: secondDate, hintText: "Second Date"),
+                const SizedBox(height: 10),
+                TextField(
+                  keyboardType: TextInputType.number,
+                  autofocus: true,
+                  style: const TextStyle(color: Colors.black),
+                  decoration: const InputDecoration(
+                      hintText: "Budget Amount",
+                      hintStyle: TextStyle(color: Colors.grey)),
+                  onChanged: (value) {
+                    int? parsedValue = int.tryParse(value);
+                    if (parsedValue != null) {
+                      budgetAmount = parsedValue;
+                    }
+                  },
+                ),
+              ],
+            )),
             actions: [
               TextButton(
                   onPressed: () {
@@ -68,7 +74,11 @@ Future<void> addBudget(BuildContext context, String selectedMonth) async {
                   )),
               TextButton(
                   onPressed: () {
-                    if (budgetAmount > 0) {
+                    if (budgetAmount > 0 &&
+                        firstDate.text != "" &&
+                        secondDate.text != "" &&
+                        isFirstDateBeforeOrSame(
+                            firstDate.text, secondDate.text)) {
                       Navigator.of(context).pop([budgetCategory, budgetAmount]);
                       canAdd = true;
                     } else {
@@ -97,7 +107,8 @@ Future<void> addBudget(BuildContext context, String selectedMonth) async {
           "Id": const Uuid().v4(),
           "Category": budgetCategory,
           "Budget": budgetAmount,
-          "Date": selectedMonth
+          "FirstDate": firstDate.text,
+          "SecondDate": secondDate.text
         }
       ])
     });

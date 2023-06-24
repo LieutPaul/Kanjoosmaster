@@ -61,3 +61,33 @@ int getNumberOfDaysInMonth(String dateString) {
 
   return numberOfDays;
 }
+
+List<String> getFirstAndLastDatesOfMonth() {
+  DateTime now = DateTime.now();
+  DateTime firstDate = DateTime(now.year, now.month, 1);
+  DateTime lastDate = DateTime(now.year, now.month + 1, 0);
+
+  DateFormat formatter = DateFormat('dd/MM/yyyy');
+  String formattedFirstDate = formatter.format(firstDate);
+  String formattedLastDate = formatter.format(lastDate);
+
+  return [formattedFirstDate, formattedLastDate];
+}
+
+bool isFirstDateBeforeOrSame(String firstDateStr, String secondDateStr) {
+  DateTime firstDate = DateTime.parse(
+      "${firstDateStr.substring(6, 10)}-${firstDateStr.substring(3, 5)}-${firstDateStr.substring(0, 2)}");
+  DateTime secondDate = DateTime.parse(
+      "${secondDateStr.substring(6, 10)}-${secondDateStr.substring(3, 5)}-${secondDateStr.substring(0, 2)}");
+
+  return !secondDate.isBefore(firstDate);
+}
+
+String convertDateFormat(String dateString) {
+  List<String> dateComponents = dateString.split('/');
+  String year = dateComponents[0];
+  String month = dateComponents[1];
+  String day = dateComponents[2];
+
+  return "$day/$month/$year";
+}

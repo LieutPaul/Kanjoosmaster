@@ -20,6 +20,9 @@ class _SpendingAnalysisState extends State<SpendingAnalysis> {
   Future<void> getLineSeries() async {
     Map<String, int> expenses = {};
     Map<String, int> earnings = {};
+    cumExp = []; // Cumulative Expenses
+    exp = [];
+    ear = [];
     var doc = await FirebaseFirestore.instance.collection("Expenses").get();
     for (var expense in doc.docs) {
       if (expense["Users"].contains(currentUser!.email) &&
@@ -67,8 +70,8 @@ class _SpendingAnalysisState extends State<SpendingAnalysis> {
             return Column(
               children: [
                 Padding(
-                  padding:
-                      const EdgeInsets.only(left: 15, right: 15, bottom: 15),
+                  padding: const EdgeInsets.only(
+                      left: 15, right: 15, bottom: 15, top: 15),
                   child: Text(
                       "Spending Analysis for ${widget.selectedMonth.substring(0, 3)}",
                       style: const TextStyle(
@@ -138,6 +141,7 @@ class _SpendingAnalysisState extends State<SpendingAnalysis> {
                         color: Colors.red),
                   ],
                 ),
+                const SizedBox(height: 50)
               ],
             );
           }),
