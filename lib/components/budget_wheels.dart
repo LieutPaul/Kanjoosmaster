@@ -8,6 +8,8 @@ import 'expense_component.dart';
 
 Widget circularBudgetChart(String id, String category, int spentAmount,
     int budget, BuildContext context) {
+  // Display the first and last dates of the budget
+  // On clicking the budget, you should be able to view all the expenses involved, in that budget.
   final currentUser = FirebaseAuth.instance.currentUser;
   double percentage = spentAmount / budget;
   Color progressColor = Colors.green;
@@ -169,13 +171,23 @@ Expanded getBudgetWheels(
               final id = budget["Id"];
               if (isFirstDateBeforeOrSame(firstDate, budgetFirstdate) &&
                   isFirstDateBeforeOrSame(budgetSeconddate, secondDate)) {
-                expenseWidgets.add(const SizedBox(height: 20));
-                if (expenseSums.keys.contains(category)) {
-                  expenseWidgets.add(circularBudgetChart(id, category,
-                      expenseSums[category]!.toInt(), budgetAmount, context));
-                } else {
+                if (listOfExpenses.keys.contains(category) == false) {
                   expenseWidgets.add(circularBudgetChart(
                       id, category, 0, budgetAmount, context));
+                } else {
+                  num sum = 0;
+                  List? expS = listOfExpenses[category];
+
+                  for (var exp in expS!) {
+                    if (isFirstDateBeforeOrSame(
+                            budgetFirstdate, convertDateFormat(exp["Date"])) &&
+                        isFirstDateBeforeOrSame(
+                            convertDateFormat(exp["Date"]), budgetSeconddate)) {
+                      sum += exp["Amount"]!.toInt();
+                    }
+                  }
+                  expenseWidgets.add(circularBudgetChart(
+                      id, category, sum.toInt(), budgetAmount, context));
                 }
               }
             }
