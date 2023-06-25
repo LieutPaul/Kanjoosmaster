@@ -18,13 +18,28 @@ class _BudgetsWidgetState extends State<BudgetsWidget> {
   final currentUser = FirebaseAuth.instance.currentUser;
   final firstDate = TextEditingController();
   final secondDate = TextEditingController();
+  List<dynamic> eCategories = [];
+  List<String> expenseCategories = [];
   Map<String, num> expenseSums = {};
   Map<String, List<dynamic>> listOfExpenses = {};
 
   Future<void> getSpentAmount() async {
     expenseSums = {};
     listOfExpenses = {};
+    expenseCategories = [];
+    eCategories = [];
     var doc = await FirebaseFirestore.instance.collection("Expenses").get();
+    var e = await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(currentUser!.email)
+        .get();
+    if (e.exists) {
+      var data = e.data();
+      eCategories = data?['ExpenseCategories'];
+      for (String c in eCategories) {
+        expenseCategories.add(c);
+      }
+    }
     for (var expense in doc.docs) {
       Map<String, dynamic> temp = expense.data();
       temp["Id"] = expense.id;
@@ -82,22 +97,17 @@ class _BudgetsWidgetState extends State<BudgetsWidget> {
           } else if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
           } else {
-            return body();
+            return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  getBudgetWheels(topBar(), firstDate.text, secondDate.text,
+                      expenseSums, listOfExpenses, expenseCategories),
+                ]);
           }
         },
       ),
     );
-  }
-
-  Widget body() {
-    return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          topBar(),
-          getBudgetWheels(
-              firstDate.text, secondDate.text, expenseSums, listOfExpenses),
-        ]);
   }
 
   Container topBar() {

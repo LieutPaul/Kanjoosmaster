@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:kanjoosmaster/widgets/pie_chart.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import '../helper.dart';
 import 'expense_component.dart';
@@ -125,8 +126,13 @@ Widget circularBudgetChart(String id, String category, int spentAmount,
   );
 }
 
-Expanded getBudgetWheels(String firstDate, String secondDate,
-    Map<String, num> expenseSums, Map<String, List<dynamic>> listOfExpenses) {
+Expanded getBudgetWheels(
+    Widget topBar,
+    String firstDate,
+    String secondDate,
+    Map<String, num> expenseSums,
+    Map<String, List<dynamic>> listOfExpenses,
+    List<String> expenseCategories) {
   final currentUser = FirebaseAuth.instance.currentUser;
   return Expanded(
       flex: 1,
@@ -143,7 +149,10 @@ Expanded getBudgetWheels(String firstDate, String secondDate,
           } else {
             final data = snapshot.data?.data();
             final budgets = data?['Budgets'] as List<dynamic>?;
-            final List<Widget> expenseWidgets = [];
+            final List<Widget> expenseWidgets = [
+              topBar,
+              const SizedBox(height: 15)
+            ];
             expenseWidgets.add(Padding(
               padding: const EdgeInsets.only(left: 15, right: 15, bottom: 30),
               child: Text("Budgets for $firstDate - $secondDate",
@@ -207,6 +216,25 @@ Expanded getBudgetWheels(String firstDate, String secondDate,
               ));
             }
             expenseWidgets.add(const SizedBox(height: 20));
+            Map<String, double> expenditures = {}, earnings = {};
+            expenseSums.forEach((key, value) {
+              if (expenseCategories.contains(key)) {
+                expenditures[key] = value.toDouble();
+              } else {
+                earnings[key] = value.toDouble();
+              }
+            });
+            if (expenditures.isNotEmpty) {
+              expenseWidgets.add(
+                customPieChart(context, expenditures, "Expenses"),
+              );
+            }
+            if (earnings.isNotEmpty) {
+              expenseWidgets.add(
+                customPieChart(context, earnings, "Earnings"),
+              );
+            }
+
             return ListView(children: expenseWidgets);
           }
         },
