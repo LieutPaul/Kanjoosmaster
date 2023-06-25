@@ -176,6 +176,7 @@ Future<void> addExpense(BuildContext context) async {
       "Earning": earning,
       "Users": [currentUser.email]
     });
+    // Checking for exceeding of any budgets :
     if (earning == false) {
       var todayDate = convertDateFormat(formatter.format(DateTime.now()));
       var b = await FirebaseFirestore.instance
