@@ -98,6 +98,7 @@ Future<void> addUser(BuildContext context, String expenseId) async {
                             );
                           },
                         );
+                        user = user.trim();
                         data["Amount"] -= amount;
                         await FirebaseFirestore.instance
                             .collection("Expenses")
@@ -105,6 +106,22 @@ Future<void> addUser(BuildContext context, String expenseId) async {
                             .update(data);
                         data["Users"] = [user];
                         data["Amount"] = amount;
+                        // Adding the category to the new user if it isn't already there.
+                        var userDocRef = FirebaseFirestore.instance
+                            .collection("Users")
+                            .doc(user);
+                        var userDoc = await userDocRef.get();
+
+                        if (userDoc.exists) {
+                          var expenseCategories =
+                              userDoc.data()?["ExpenseCategories"];
+
+                          expenseCategories =
+                              FieldValue.arrayUnion([data["Category"]]);
+
+                          await userDocRef
+                              .update({"ExpenseCategories": expenseCategories});
+                        }
                         await FirebaseFirestore.instance
                             .collection("Expenses")
                             .add(data);

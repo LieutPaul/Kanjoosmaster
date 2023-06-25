@@ -61,7 +61,7 @@ Column getLargeExpenses(BuildContext context) {
                     )),
                 TextButton(
                     onPressed: () {
-                      if (expenseTitle != "" && expenseAmount > 0) {
+                      if (expenseTitle.trim() != "" && expenseAmount > 0) {
                         Navigator.of(context)
                             .pop([expenseTitle, expenseAmount]);
                       } else {
@@ -74,7 +74,6 @@ Column getLargeExpenses(BuildContext context) {
                     )),
               ],
             ));
-
     await FirebaseFirestore.instance
         .collection("Users")
         .doc(currentUser!.email)
@@ -82,7 +81,7 @@ Column getLargeExpenses(BuildContext context) {
       "LargeExpenses": FieldValue.arrayUnion([
         {
           "Id": const Uuid().v4(),
-          "Title": expenseTitle,
+          "Title": expenseTitle.trim(),
           "Amount": expenseAmount,
           "SavedAmount": 0,
           "Links": []

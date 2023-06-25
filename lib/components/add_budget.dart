@@ -105,7 +105,7 @@ Future<void> addBudget(BuildContext context) async {
       "Budgets": FieldValue.arrayUnion([
         {
           "Id": const Uuid().v4(),
-          "Category": budgetCategory,
+          "Category": budgetCategory.trim(),
           "Budget": budgetAmount,
           "FirstDate": firstDate.text,
           "SecondDate": secondDate.text

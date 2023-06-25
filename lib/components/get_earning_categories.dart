@@ -35,7 +35,7 @@ Column getEarningCategories(BuildContext context) {
                     )),
                 TextButton(
                     onPressed: () {
-                      if (newCategory != "") {
+                      if (newCategory.trim() != "") {
                         Navigator.of(context).pop(newCategory);
                       } else {
                         Fluttertoast.showToast(msg: "Invalid Input");
@@ -47,6 +47,7 @@ Column getEarningCategories(BuildContext context) {
                     )),
               ],
             ));
+    newCategory = newCategory.trim();
     if (newCategory.trim().isNotEmpty) {
       await FirebaseFirestore.instance
           .collection("Users")

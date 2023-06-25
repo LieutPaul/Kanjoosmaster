@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:kanjoosmaster/helper.dart';
 
 import '../widgets/checkbox.dart';
 import '../widgets/custom_dropdown.dart';
@@ -137,7 +138,7 @@ Future<void> addExpense(BuildContext context) async {
                     )),
                 TextButton(
                     onPressed: () {
-                      if (expenseTitle != "" &&
+                      if (expenseTitle.trim() != "" &&
                           expenseCategory != "" &&
                           expenseAmount > 0) {
                         Navigator.of(context).pop([
@@ -167,13 +168,78 @@ Future<void> addExpense(BuildContext context) async {
           }));
   if (canAdd) {
     await FirebaseFirestore.instance.collection("Expenses").add({
-      "Title": expenseTitle,
+      "Title": expenseTitle.trim(),
       "Date": formatter.format(DateTime.now()).substring(0, 10),
-      "Description": expenseDescription,
+      "Description": expenseDescription.trim(),
       "Category": expenseCategory,
       "Amount": expenseAmount,
       "Earning": earning,
       "Users": [currentUser.email]
     });
+    if (earning == false) {
+      var todayDate = convertDateFormat(formatter.format(DateTime.now()));
+      var b = await FirebaseFirestore.instance
+          .collection("Users")
+          .doc(currentUser.email)
+          .get();
+
+      if (b.exists) {
+        var budgets = b.data()!["Budgets"];
+        for (var budget in budgets) {
+          // Today falls under the budget and it is of the correct category
+          if (budget["Category"] == expenseCategory &&
+              isFirstDateBeforeOrSame(budget["FirstDate"], todayDate) &&
+              isFirstDateBeforeOrSame(todayDate, budget["SecondDate"])) {
+            num expenseSum = 0;
+            var doc =
+                await FirebaseFirestore.instance.collection("Expenses").get();
+            for (var d in doc.docs) {
+              var expense = d.data();
+              if (expense["Users"].contains(currentUser.email) &&
+                  expense["Category"] == expenseCategory &&
+                  isFirstDateBeforeOrSame(budget["FirstDate"],
+                      convertDateFormat(expense["Date"])) &&
+                  isFirstDateBeforeOrSame(convertDateFormat(expense["Date"]),
+                      budget["SecondDate"])) {
+                expenseSum += expense["Amount"];
+              }
+            }
+            if (expenseSum >= budget["Budget"]) {
+              // ignore: use_build_context_synchronously
+              showDialog(
+                context: context,
+                barrierDismissible: true,
+                builder: (BuildContext context) {
+                  return Dialog(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            'Budget Exceeded!!',
+                            style: TextStyle(fontSize: 25),
+                          ),
+                          const SizedBox(height: 5),
+                          Text("Budget : $expenseCategory"),
+                          const SizedBox(height: 5),
+                          Text(
+                              'Dates : ${budget["FirstDate"]} - ${budget["SecondDate"]}'),
+                          const SizedBox(height: 5),
+                          Text('Budget Amount : ${budget["Budget"]}'),
+                          const SizedBox(height: 5),
+                          Text('Spent Amount : $expenseSum'),
+                          const SizedBox(height: 5),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+            }
+          }
+        }
+      }
+    }
   }
 }

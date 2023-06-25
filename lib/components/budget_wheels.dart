@@ -16,9 +16,6 @@ Widget circularBudgetChart(
     List<dynamic> expS,
     String startDate,
     String endDate) {
-  // Display the first and last dates of the budget
-  // On clicking the budget, you should be able to view all the expenses involved, in that budget.
-
   double percentage = spentAmount / budget;
   Color progressColor = Colors.green;
 
@@ -222,6 +219,7 @@ Expanded getBudgetWheels(
             expenseWidgets.add(const SizedBox(height: 20));
             Map<String, double> expenditures = {}, earnings = {};
             expenseSums.forEach((key, value) {
+              key = key.toString().trim();
               if (expenseCategories.contains(key)) {
                 expenditures[key] = value.toDouble();
               } else {

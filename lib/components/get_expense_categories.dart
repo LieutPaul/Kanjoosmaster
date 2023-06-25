@@ -35,7 +35,7 @@ Column getExpenseCategories(BuildContext context) {
                     )),
                 TextButton(
                     onPressed: () {
-                      if (newCategory != "") {
+                      if (newCategory.trim() != "") {
                         Navigator.of(context).pop(newCategory);
                       } else {
                         Fluttertoast.showToast(msg: "Invalid Input");
@@ -48,6 +48,7 @@ Column getExpenseCategories(BuildContext context) {
               ],
             ));
     if (newCategory.trim().isNotEmpty) {
+      newCategory = newCategory.trim();
       await FirebaseFirestore.instance
           .collection("Users")
           .doc(currentUser!.email)
