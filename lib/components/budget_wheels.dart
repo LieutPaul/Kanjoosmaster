@@ -199,6 +199,7 @@ Expanded getBudgetWheels(
               ));
               for (var expense in expenses) {
                 expenseWidgets.add(Expense(
+                    canDelete: true,
                     title: expense["Title"],
                     category: expense["Category"],
                     amount: expense["Amount"],

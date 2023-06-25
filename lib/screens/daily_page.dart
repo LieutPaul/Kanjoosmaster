@@ -84,6 +84,7 @@ class _DailyPageState extends State<DailyPage> {
                             data['Date'] == _selectedDate) {
                           expenseWidgets.add(
                             Expense(
+                                canDelete: true,
                                 date: data["Date"],
                                 expenseId: doc.id,
                                 title: data['Title'],

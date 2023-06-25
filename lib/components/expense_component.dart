@@ -18,6 +18,7 @@ class Expense extends StatefulWidget {
   final int amount;
   final bool earning; // true -> It is earning, not income
   final String date;
+  final bool canDelete;
   const Expense(
       {super.key,
       required this.title,
@@ -26,7 +27,8 @@ class Expense extends StatefulWidget {
       required this.earning,
       required this.expenseId,
       required this.description,
-      required this.date});
+      required this.date,
+      required this.canDelete});
 
   @override
   State<Expense> createState() => _ExpenseState();
@@ -255,66 +257,67 @@ class _ExpenseState extends State<Expense> {
                       "Add User to Expense",
                       style: TextStyle(color: Colors.black),
                     )),
-                TextButton(
-                    onPressed: () async {
-                      showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (BuildContext context) {
-                          return const Dialog(
-                            child: Padding(
-                              padding: EdgeInsets.all(16.0),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  CircularProgressIndicator(),
-                                  SizedBox(width: 16.0),
-                                  Text('Deleting...'),
-                                ],
+                if (widget.canDelete == true)
+                  TextButton(
+                      onPressed: () async {
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (BuildContext context) {
+                            return const Dialog(
+                              child: Padding(
+                                padding: EdgeInsets.all(16.0),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    CircularProgressIndicator(),
+                                    SizedBox(width: 16.0),
+                                    Text('Deleting...'),
+                                  ],
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                      );
-                      try {
-                        CollectionReference expensesCollection =
-                            FirebaseFirestore.instance.collection('Expenses');
+                            );
+                          },
+                        );
+                        try {
+                          CollectionReference expensesCollection =
+                              FirebaseFirestore.instance.collection('Expenses');
 
-                        DocumentReference documentRef =
-                            expensesCollection.doc(widget.expenseId);
+                          DocumentReference documentRef =
+                              expensesCollection.doc(widget.expenseId);
 
-                        DocumentSnapshot<Map<String, dynamic>> snapshot =
-                            await documentRef.get()
-                                as DocumentSnapshot<Map<String, dynamic>>;
+                          DocumentSnapshot<Map<String, dynamic>> snapshot =
+                              await documentRef.get()
+                                  as DocumentSnapshot<Map<String, dynamic>>;
 
-                        if (snapshot.exists) {
-                          Map<String, dynamic> data = snapshot.data()!;
+                          if (snapshot.exists) {
+                            Map<String, dynamic> data = snapshot.data()!;
 
-                          List<dynamic> users = List.from(data['Users']);
+                            List<dynamic> users = List.from(data['Users']);
 
-                          users.remove(currentUser!.email);
+                            users.remove(currentUser!.email);
 
-                          await documentRef.update({'Users': users});
+                            await documentRef.update({'Users': users});
 
-                          if (users.isEmpty) {
-                            await documentRef.delete();
+                            if (users.isEmpty) {
+                              await documentRef.delete();
+                            }
                           }
-                        }
 
-                        // ignore: use_build_context_synchronously
-                        Navigator.pop(context);
-                        // ignore: use_build_context_synchronously
-                        Navigator.pop(context);
-                      } catch (error) {
-                        // ignore: avoid_print
-                        print('Error deleting document: $error');
-                        Navigator.pop(context);
-                      }
-                    },
-                    child: const Text(
-                      "Delete Transaction",
-                      style: TextStyle(color: Colors.black),
-                    )),
+                          // ignore: use_build_context_synchronously
+                          Navigator.pop(context);
+                          // ignore: use_build_context_synchronously
+                          Navigator.pop(context);
+                        } catch (error) {
+                          // ignore: avoid_print
+                          print('Error deleting document: $error');
+                          Navigator.pop(context);
+                        }
+                      },
+                      child: const Text(
+                        "Delete Transaction",
+                        style: TextStyle(color: Colors.black),
+                      )),
               ],
             );
           }));

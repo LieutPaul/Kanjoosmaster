@@ -73,6 +73,7 @@ class _ExpandedBudgetState extends State<ExpandedBudget> {
         ),
         for (var expense in widget.expS)
           Expense(
+              canDelete: false,
               title: expense["Title"],
               category: expense["Category"],
               amount: expense["Amount"],
