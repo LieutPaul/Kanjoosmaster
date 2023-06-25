@@ -1,16 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:kanjoosmaster/screens/expanded_budget_page.dart';
 import 'package:kanjoosmaster/widgets/pie_chart.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import '../helper.dart';
 import 'expense_component.dart';
 
-Widget circularBudgetChart(String id, String category, int spentAmount,
-    int budget, BuildContext context) {
+Widget circularBudgetChart(
+    String id,
+    String category,
+    int spentAmount,
+    int budget,
+    BuildContext context,
+    List<dynamic> expS,
+    String startDate,
+    String endDate) {
   // Display the first and last dates of the budget
   // On clicking the budget, you should be able to view all the expenses involved, in that budget.
-  final currentUser = FirebaseAuth.instance.currentUser;
+
   double percentage = spentAmount / budget;
   Color progressColor = Colors.green;
 
@@ -38,59 +46,27 @@ Widget circularBudgetChart(String id, String category, int spentAmount,
           children: [
             const SizedBox(height: 5),
             GestureDetector(
-              onTap: () async {
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (BuildContext context) {
-                    return const Dialog(
-                      child: Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            CircularProgressIndicator(),
-                            SizedBox(width: 16.0),
-                            Text('Deleting...'),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ExpandedBudget(
+                      expS: expS,
+                      startDate: startDate,
+                      endDate: endDate,
+                      budgetId: id,
+                      category: category,
+                      budgetAmount: budget,
+                      spentAmount: spentAmount,
+                      percentage: percentage,
+                      progressColor: progressColor,
+                    ),
+                  ),
                 );
-                try {
-                  CollectionReference expensesCollection =
-                      FirebaseFirestore.instance.collection('Users');
-
-                  DocumentReference documentRef =
-                      expensesCollection.doc(currentUser!.email);
-
-                  DocumentSnapshot<Map<String, dynamic>> snapshot =
-                      await documentRef.get()
-                          as DocumentSnapshot<Map<String, dynamic>>;
-
-                  if (snapshot.exists) {
-                    Map<String, dynamic> data = snapshot.data()!;
-
-                    List<dynamic> budgets = List.from(data['Budgets']);
-
-                    budgets.removeWhere((budget) {
-                      return budget["Id"] == id;
-                    });
-
-                    await documentRef.update({'Budgets': budgets});
-                  }
-                  // ignore: use_build_context_synchronously
-                  Navigator.pop(context);
-                } catch (error) {
-                  // ignore: avoid_print
-                  print('Error deleting document: $error');
-                  Navigator.pop(context);
-                }
               },
               child: const Icon(
-                Icons.delete,
-                color: Colors.red,
+                Icons.launch,
+                color: Colors.white,
               ),
             ),
             const SizedBox(height: 15),
@@ -173,21 +149,36 @@ Expanded getBudgetWheels(
                   isFirstDateBeforeOrSame(budgetSeconddate, secondDate)) {
                 if (listOfExpenses.keys.contains(category) == false) {
                   expenseWidgets.add(circularBudgetChart(
-                      id, category, 0, budgetAmount, context));
+                      id,
+                      category,
+                      0,
+                      budgetAmount,
+                      context,
+                      [],
+                      budgetFirstdate,
+                      budgetSeconddate));
                 } else {
                   num sum = 0;
                   List? expS = listOfExpenses[category];
-
+                  List? expS2 = [];
                   for (var exp in expS!) {
                     if (isFirstDateBeforeOrSame(
                             budgetFirstdate, convertDateFormat(exp["Date"])) &&
                         isFirstDateBeforeOrSame(
                             convertDateFormat(exp["Date"]), budgetSeconddate)) {
                       sum += exp["Amount"]!.toInt();
+                      expS2.add(exp);
                     }
                   }
                   expenseWidgets.add(circularBudgetChart(
-                      id, category, sum.toInt(), budgetAmount, context));
+                      id,
+                      category,
+                      sum.toInt(),
+                      budgetAmount,
+                      context,
+                      expS2,
+                      budgetFirstdate,
+                      budgetSeconddate));
                 }
               }
             }

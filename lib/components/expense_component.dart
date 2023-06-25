@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:kanjoosmaster/components/add_user_to_expense.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../helper.dart';
+
 class Expense extends StatefulWidget {
   final String expenseId;
   final String title;
@@ -133,7 +135,7 @@ class _ExpenseState extends State<Expense> {
             return AlertDialog(
               backgroundColor: Colors.white,
               title: Text(
-                "${widget.title}\n${widget.date}",
+                "${widget.title}\n${convertDateFormat(widget.date)}",
                 style: const TextStyle(
                     fontSize: 25,
                     fontWeight: FontWeight.w800,

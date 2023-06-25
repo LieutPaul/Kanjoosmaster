@@ -30,7 +30,7 @@ Row getUserName(BuildContext context) {
               return Text("${currentUser.email}");
             }
           }),
-      const Icon(Icons.edit, color: Colors.white)
+      // const Icon(Icons.edit, color: Colors.white)
     ],
   );
 }
