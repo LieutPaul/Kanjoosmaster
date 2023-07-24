@@ -30,17 +30,14 @@ class _DailyPageState extends State<DailyPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: _selectedDate.substring(_selectedDate.length - 2) ==
-              DateTime.now().day.toString()
-          ? FloatingActionButton(
-              backgroundColor: Colors.white,
-              onPressed: () => addExpense(context),
-              child: const Icon(
-                Icons.add,
-                color: Colors.black,
-              ),
-            )
-          : null,
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.white,
+        onPressed: () => addExpense(context),
+        child: const Icon(
+          Icons.add,
+          color: Colors.black,
+        ),
+      ),
       backgroundColor: Colors.black.withOpacity(0.80),
       body: body(),
     );
